@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <title>DNA | Cloud Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        #status {
+            display: none;
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body
+    style="background-color: rgb(255,226,188);background: linear-gradient(153deg, rgba(255,226,188,1) 0%, rgba(196,172,138,1) 100%) no-repeat;overflow-y: hidden !important;">
+    <div class="container-fluid py-4" style="min-height:80rem;">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-xl-2"></div>
+                    <div class="col-xl-8">
+                        <div class="row">
+                            <div class="col-md-12" style="padding-top:10rem">
+                                <div class="card bg-dark">
+                                    <div class="card-header bg-dark mx-4 p-3 text-center">
+                                        <div class="icon icon-shape icon-lg shadow text-center border-radius-lg">
+                                            <i class="fa-solid fa-database fa-2xl opacity-10" style="color:wheat;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-body pt-0 p-3 text-center">
+                                        <!-- <h6 class="text-center mb-0" style="color:wheat">CLOUD DELETION CONTROL</h6>
+                                        <h6 class="text-xs" style="color:wheat">This feature allows you to delete all
+                                            data on the cloud.</h6> -->
+                                        <hr class="horizontal light my-2" style="color:wheat !important">
+                                        <div class="mt-3 text-center text-xs" style="color:wheat">
+                                            <h6 class="text-center" style="color:rgb(255, 196, 34)"><i
+                                                    class="fa-solid fa-triangle-exclamation"></i> CAUTION </h6>
+                                            <hr class="horizontal light" style="color:wheat !important">
+                                        </div>
+                                        <button id="deleteBtn" class="btn btn-outline-danger btn-lg mt-2"
+                                            style="color:wheat"><i class="fa-regular fa-trash-can"></i>&nbsp; &nbsp;
+                                            Wipe the Cloud</button>
+                                        <button id="cancelBtn" class="btn btn-outline-primary btn-lg mt-2"
+                                            style="color:wheat">Cancel the process</button>
+                                    </div>
+                                </div>
+                                <div id="cancel" style="display: none;" align="center">
+                                  <h4 class="text-center mt-4" style="color:rgb(49, 49, 49)"> Deletion canceled Successfully </h4>
+                                </div>
+                                <div id="status" align="center">
+                                    <div id="container">
+                                        <!-- This div acts as a container for the game elements, providing easier styling and positioning. -->
+                                        <!-- <div id="loading">Deleting...</div> -->
+                                        <canvas id="pongCanvas" width="380" height="200" style="margin-left:-1.5rem"></canvas>
+                                        <!-- The <canvas> element is used to draw graphics on the page via JavaScript. Here, it's set up for the Pong game. -->
+                                        
+                                        <div id="loading">Deleting...</div>
+                                        
+                                        <div id="score"></div>
+                                        <!-- This div will display the game score, updated by JavaScript. -->
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+    /* The <style> section contains CSS rules for styling the document. */
+
+    html {
+      height: 100%;
+      /* This ensures the html element takes up the full height of the viewport. */
+    }
+
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #container {
+      width: 340px;
+      /* Adjust container width if necessary, removed flex and alignment styles */
+    }
+
+    #pongCanvas {
+      display: block;
+      margin: 0 auto; /* Center the canvas horizontally if needed */
+    }
+
+    /* Styling for the Loading text */
+#loading {
+  font-family: monospace;
+  width: 100%;
+  text-align: center;
+  font-size: 22px;
+  color: #707070;
+  margin-bottom: 0px; /* Spacing between the loading text and the score */
+  opacity: 0; /* Start with the text being invisible */
+  animation: fadeInOut 2s infinite; /* Apply the animation */
+}
+
+/* Keyframes for the fade-in and fade-out effect */
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}    
+       
+  #score {
+    font-family: monospace;
+    width: 100%; /* Ensure the element spans the full width of its container */
+    text-align: center; /* Center the text horizontally */
+    font-size: 14px;
+    color: #707070;
+    margin: 0px 0; /* Add some margin for spacing, adjust as needed */
+  }
+</style>
+
+    <script>
+        let isRunning = false;
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Get references to the elements
+            const cancelButton = document.getElementById('cancelBtn');
+            const statusDiv = document.getElementById('status');
+            const cancel = document.getElementById('cancel');
+
+            // Add a click event listener to the cancel button
+            cancelButton.addEventListener('click', () => {
+                // Set the display property of the status div to none
+                statusDiv.style.display = 'none';
+                // Set the display property of the cancel div to block
+                cancel.style.display = 'block';
+            });
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            if (!isRunning) {
+                fetch('/start-python', { method: 'POST' })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                        document.getElementById('status').style.display = 'block';
+                        document.getElementById('cancel').style.display = 'none';
+                        startPongGame();
+                        isRunning = true;
+                    })
+                    .catch(error => console.error('Error starting Python script:', error));
+            }
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            if (isRunning) {
+                fetch('/cancel-python', { method: 'POST' })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data);
+                        if (data.includes('Python script stopped')) {
+                            document.getElementById('status').style.display = 'none';
+                            isRunning = false;
+                        }
+                    });
+            }
+        });
+    </script>
+<script>
+    /* The <script> section contains JavaScript that controls the game's functionality. */
+
+    // Define a palette of colors to use in the game.
+    const colorPalette = {
+      ArcticPowder: "#F1F6F4",
+      MysticMint: "#2B2B35",
+      Forsythia: "#FFC801",
+      DeepSaffron: "#FF9932",
+      NocturnalExpedition: "#404150",
+      OceanicNoir: "#172B36",
+    };
+
+    // Select the canvas element and its 2D drawing context.
+    const canvas = document.getElementById("pongCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Select the score display element.
+    const scoreElement = document.getElementById("score");
+
+    // Define colors for day and night themes.
+    const DAY_COLOR = colorPalette.MysticMint;
+    const DAY_BALL_COLOR = colorPalette.NocturnalExpedition;
+    const NIGHT_COLOR = colorPalette.NocturnalExpedition;
+    const NIGHT_BALL_COLOR = colorPalette.MysticMint;
+
+    // Set the size for the squares that make up the game background.
+    const SQUARE_SIZE = 15;
+
+    // Calculate the number of squares that fit into the canvas horizontally and vertically.
+    const numSquaresX = canvas.width / SQUARE_SIZE;
+    const numSquaresY = canvas.height / SQUARE_SIZE;
+
+    // Initialize an array to store the colors of each square.
+    let squares = [];
+
+    // Populate the squares array with initial colors, dividing the canvas into day and night sides.
+    for (let i = 0; i < numSquaresX; i++) {
+      squares[i] = [];
+      for (let j = 0; j < numSquaresY; j++) {
+        squares[i][j] = i < numSquaresX / 2 ? DAY_COLOR : NIGHT_COLOR;
+      }
+    }
+
+    // Set initial positions and velocities for two balls.
+    let x1 = canvas.width / 4, y1 = canvas.height / 2, dx1 = 6, dy1 = -6;
+    let x2 = (canvas.width / 4) * 3, y2 = canvas.height / 2, dx2 = -6, dy2 = 6;
+
+    // Variable to track iterations for debugging.
+    let iteration = 0;
+
+    // Function to draw a ball on the canvas.
+    function drawBall(x, y, color) {
+      ctx.beginPath(); // Begin a new path for drawing.
+      ctx.arc(x, y, SQUARE_SIZE / 2, 0, Math.PI * 2, false); // Draw a circle.
+      ctx.fillStyle = color; // Set the fill color for the circle.
+      ctx.fill(); // Fill the circle with the chosen color.
+      ctx.closePath(); // Close the current path.
+    }
+
+    // Function to draw the squares that make up the game background.
+    function drawSquares() {
+      for (let i = 0; i < numSquaresX; i++) {
+        for (let j = 0; j < numSquaresY; j++) {
+          ctx.fillStyle = squares[i][j]; // Set the fill color for the current square.
+          ctx.fillRect(i * SQUARE_SIZE, j * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE); // Draw the square.
+        }
+      }
+    }
+
+    // Function to update the color of squares hit by a ball and calculate bounce.
+    function updateSquareAndBounce(x, y, dx, dy, color) {
+      let updatedDx = dx; // Copy the horizontal velocity.
+      let updatedDy = dy; // Copy the vertical velocity.
+
+      // Check multiple points around the ball's circumference for collisions.
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
+        let checkX = x + Math.cos(angle) * (SQUARE_SIZE / 2); // Calculate the x-coordinate to check.
+        let checkY = y + Math.sin(angle) * (SQUARE_SIZE / 2); // Calculate the y-coordinate to check.
+
+        let i = Math.floor(checkX / SQUARE_SIZE); // Determine the column of the square being checked.
+        let j = Math.floor(checkY / SQUARE_SIZE); // Determine the row of the square being checked.
+
+        // Ensure the checked coordinates are within the canvas boundaries.
+        if (i >= 0 && i < numSquaresX && j >= 0 && j < numSquaresY) {
+          // Change the square's color if it's different from the ball's color.
+          if (squares[i][j] !== color) {
+            squares[i][j] = color; // Update the square's color.
+
+            // Bounce the ball by inverting its velocity component.
+            // The direction depends on the angle of collision.
+            if (Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))) {
+              updatedDx = -updatedDx; // Invert horizontal velocity.
+            } else {
+              updatedDy = -updatedDy; // Invert vertical velocity.
+            }
+          }
+        }
+      }
+
+      return { dx: updatedDx, dy: updatedDy }; // Return the possibly updated velocities.
+    }
+
+    // Function to update the score display based on the number of squares of each color.
+    function updateScoreElement() {
+      let dayScore = 0; // Initialize the score for day-colored squares.
+      let nightScore = 0; // Initialize the score for night-colored squares.
+
+      // Count the number of squares of each color.
+      for (let i = 0; i < numSquaresX; i++) {
+        for (let j = 0; j < numSquaresY; j++) {
+          if (squares[i][j] === DAY_COLOR) {
+            dayScore++; // Increment day score for each day-colored square.
+          } else if (squares[i][j] === NIGHT_COLOR) {
+            nightScore++; // Increment night score for each night-colored square.
+          }
+        }
+      }
+
+      // ⚠️ Update the text content of the score display element.
+      scoreElement.textContent = `AI ${dayScore} | Humans ${nightScore}`;
+    }
+
+    // Function to check and handle collisions with the canvas boundary.
+    function checkBoundaryCollision(x, y, dx, dy) {
+      // Invert horizontal velocity if the ball hits the left or right edge.
+      if (x + dx > canvas.width - SQUARE_SIZE / 2 || x + dx < SQUARE_SIZE / 2) {
+        dx = -dx;
+      }
+
+      // Invert vertical velocity if the ball hits the top or bottom edge.
+      if (y + dy > canvas.height - SQUARE_SIZE / 2 || y + dy < SQUARE_SIZE / 2) {
+        dy = -dy;
+      }
+
+      return { dx: dx, dy: dy }; // Return the possibly updated velocities.
+    }
+
+    // Main drawing function, called repeatedly to animate the game.
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas.
+      drawSquares(); // Draw the background squares.
+
+      // Draw and update the first ball.
+      drawBall(x1, y1, DAY_BALL_COLOR);
+      let bounce1 = updateSquareAndBounce(x1, y1, dx1, dy1, DAY_COLOR);
+      dx1 = bounce1.dx;
+      dy1 = bounce1.dy;
+
+      // Draw and update the second ball.
+      drawBall(x2, y2, NIGHT_BALL_COLOR);
+      let bounce2 = updateSquareAndBounce(x2, y2, dx2, dy2, NIGHT_COLOR);
+      dx2 = bounce2.dx;
+      dy2 = bounce2.dy;
+
+      // Check and handle boundary collisions for both balls.
+      let boundary1 = checkBoundaryCollision(x1, y1, dx1, dy1);
+      dx1 = boundary1.dx;
+      dy1 = boundary1.dy;
+
+      let boundary2 = checkBoundaryCollision(x2, y2, dx2, dy2);
+      dx2 = boundary2.dx;
+      dy2 = boundary2.dy;
+
+      // Update ball positions based on their velocities.
+      x1 += dx1;
+      y1 += dy1;
+      x2 += dx2;
+      y2 += dy2;
+
+      // Increment the iteration counter and log every 1000 iterations for debugging.
+      iteration++;
+      if (iteration % 1_000 === 0) console.log("iteration", iteration);
+
+      updateScoreElement(); // Update the score display.
+
+      requestAnimationFrame(draw); // Request the next frame for animation.
+    }
+
+    requestAnimationFrame(draw); // Start the animation loop.
+  </script> 
+    <script src="assets/js/core/popper.min.js"></script>
+    <script src="assets/js/core/bootstrap.min.js"></script>
+    <script src="assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
+</body>
+
+</html>
